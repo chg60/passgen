@@ -1,10 +1,11 @@
 """
 Generator for simple or complex passwords.
 """
-
-import sys
 import argparse
 import random
+import string
+import sys
+
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument("--length", type=int, default=12,
@@ -13,44 +14,29 @@ parser.add_argument("--no-lower", action="store_true",
                     help="don't use lowercase letters")
 parser.add_argument("--no-upper", action="store_true",
                     help="don't use uppercase letters")
-parser.add_argument("--no-numer", action="store_true",
+parser.add_argument("--no-number", action="store_true",
                     help="don't use numeric characters")
 parser.add_argument("--no-special", action="store_true",
                     help="don't use special characters")
-
-lower = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n",
-         "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
-upper = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N",
-         "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"]
-numer = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"]
-special = ["?", "!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "-", "+"]
-
 
 def main(arguments):
     args = parser.parse_args(arguments)
     password = ""
 
-    allowed_chars = list()
-    if args.no_lower is False:
-        for char in lower:
-            allowed_chars.append(char)
-    if args.no_upper is False:
-        for char in upper:
-            allowed_chars.append(char)
-    if args.no_numer is False:
-        for char in numer:
-            allowed_chars.append(char)
-    if args.no_special is False:
-        for char in special:
-            allowed_chars.append(char)
+    allowed_chars = []
+    if not args.no_lower:
+        allowed_chars.extend(string.ascii_lowercase)
+    if not args.no_upper:
+        allowed_chars.extend(string.ascii_uppercase)
+    if not args.no_number:
+        allowed_chars.extend(string.digits)
+    if not args.no_special:
+        allowed_chars.extend(string.punctuation)
 
-    if len(allowed_chars) == 0:
+    if not allowed_chars:
         raise ValueError("Cannot generate password with 0 allowed characters.")
 
-    while len(password) < args.length:
-        password += random.choice(allowed_chars)
-
-    print(password)
+    print("".join(random.choices(allowed_chars, k=args.length)))
 
 
 if __name__ == "__main__":
